@@ -17,7 +17,7 @@ pub struct UnbondRequest {
 }
 pub struct UnbondRequestsIndexes<'a> {
     // pk goes to second tuple element
-    pub user: MultiIndex<'a, String, UnbondRequest, String>,
+    pub user: MultiIndex<'a, String, UnbondRequest, (u64,Addr)>,
 }
 
 impl<'a> IndexList<UnbondRequest> for UnbondRequestsIndexes<'a> {
