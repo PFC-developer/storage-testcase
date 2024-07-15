@@ -17,7 +17,7 @@ pub struct UnbondRequest {
 }
 pub struct UnbondRequestsIndexes<'a> {
     // pk goes to second tuple element
-    pub user: MultiIndex<'a, String, UnbondRequest, String>,
+    pub user: MultiIndex<'a, Addr, UnbondRequest, Addr>,
 }
 
 impl<'a> IndexList<UnbondRequest> for UnbondRequestsIndexes<'a> {
@@ -27,12 +27,12 @@ impl<'a> IndexList<UnbondRequest> for UnbondRequestsIndexes<'a> {
     }
 }
 
-pub fn unbond_requests_user_idx(_pk: &[u8], d: &UnbondRequest) -> String {
-    d.user.to_string()
+pub fn unbond_requests_user_idx(_pk: &[u8], d: &UnbondRequest) -> Addr {
+    d.user.clone()
 }
 
 pub fn unbond_requests<'a>()
-    -> IndexedMap< (u64, &'a str), UnbondRequest, UnbondRequestsIndexes<'a>> {
+    -> IndexedMap< (u64, &'a Addr), UnbondRequest, UnbondRequestsIndexes<'a>> {
     IndexedMap::new(
         UNBOND_KEY_V101,
         UnbondRequestsIndexes {
@@ -51,7 +51,7 @@ fn main() {
     unbond_requests()
         .save(
             deps.as_mut().storage,
-            (128u64, user_addr.as_str()),
+            (128u64, &user_addr),
             &UnbondRequest {
                 id: 128u64,
                 user: user_addr.clone(), //Addr::unchecked(contract),
@@ -75,7 +75,7 @@ fn main() {
     let elements = unbond_requests()
         .idx
         .user
-        .prefix(user_addr.to_string())
+        .prefix(user_addr)
         //  .prefix(contract.to_string())
         .range(mut_deps.storage, None, None, Order::Ascending)
         .take(100)
